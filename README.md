@@ -17,3 +17,13 @@ Assumptions:
         # but ironically I don't have the real life time to do that. so for now this (assumes every system has more than one navigator arm bot). 
 
     1 time = 1 min
+
+
+
+
+    # bc each "unit" in the parking lot represents one parking space, and parking spaces arent square, we need a separate x and y speed for the navigators
+    # we assume the worst case scenario where it takes the arm nav 3 minutes to complete the plug guidance feature. thats in our design requirements
+
+    # assuming nav moves at 3mph, or 264ft/min, and a parking space is positioned so that the y axis follows the car's length, and the x axis follows the cars width
+    # xSpeed=31.05 means that the nav traverses the width of 31.05 parking spaces in one minute (aka it moves at 3mph)
+    # ySpeed=14.67 means that the nav traverses the length of 14.67 parking spaces in one minute (aka it moves at 3mph)

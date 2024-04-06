@@ -2,7 +2,7 @@ import Car
 
 class Battery:
     # Constructor
-    # chargeRate = time unit takes to charge by 1%. assume all cars have same max charge amount
+    # chargeRate = time unit takes to charge by 1%. assume all cars have same max charge amount, 40kwh. so chargeRate= 1.3
     def __init__(self, xPos, yPos, chargeLevel, chargeRate, available):
         self.xPos = xPos
         self.yPos = yPos
@@ -11,7 +11,7 @@ class Battery:
         self.available = available
 
     # Variables
-    chargingThreshold = 100 # the charging level at which the battery can go charge a car
+    chargingThreshold = 100 # the charging level at which the battery is allowed to go charge a car
 
     # Methods
     def updateAvailability(self):

@@ -8,4 +8,4 @@ class Car:
         self. available = available
 
     # Variables
-    maxCharge = 100
+    maxCharge = 80

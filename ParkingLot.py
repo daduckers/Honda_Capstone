@@ -13,16 +13,27 @@ class ParkingLot:
       self.cars = []
       self.navigators = []
       self.batteries = []
+      print(">> CREATED A LOT OF SIZE " + str(self.xSize) + ", " + str(self.ySize))
 
   # creates and adds a battery to the parkinglot's list of battery objects
   def buyBattery(self, xPos, yPos, chargeLevel, chargeRate, available):
     newBattery = Battery.Battery(xPos, yPos, chargeLevel, chargeRate, available)
     self.batteries.append(newBattery)
 
+  def buyBatteries(self, numBatts, xPos, yPos, chargeLevel, chargeRate, available):
+    for i in range(numBatts):
+      self.buyBattery(xPos, yPos, chargeLevel, chargeRate, available)
+    print("Just bought " + str(numBatts) + " batteries")
+
   # creates and adds a navigator to the parkinglot's list of navigator objects
-  def buyNavigator(self, yPos, xPos, speed, plugTime, available):
-    newNavigator = Navigator.Navigator(yPos, xPos, speed, plugTime, available)
+  def buyNavigator(self, yPos, xPos, xSpeed, ySpeed, plugTime, available):
+    newNavigator = Navigator.Navigator(yPos, xPos, xSpeed, ySpeed, plugTime, available)
     self.navigators.append(newNavigator)
+
+  def buyNavigators(self, numNavs, yPos, xPos, xSpeed, ySpeed, plugTime, available):
+      for i in range(numNavs):
+        self.buyNavigator(yPos, xPos, xSpeed, ySpeed, plugTime, available)
+      print("Just bought " + str(numNavs) + " navigators.")
 
   # populate lot with random num cars in random places. can index the new cars using myCars[]
   def populate(self, numCars):
@@ -34,6 +45,8 @@ class ParkingLot:
       lowerLimit = ranChargeLevel + 1
       ranDesiredCharge = random.randrange(lowerLimit, 100, 1) 
 
+      print("Car #" + str(i) + " needs " + str(ranDesiredCharge - ranChargeLevel) + " percent charge, and is at " + str(ranX) + "," + str(ranY) + ".")
+
       # this part is now irrelavant, but I keep it just for reassurance
       if ranDesiredCharge >= ranChargeLevel:
         available = True
@@ -41,8 +54,9 @@ class ParkingLot:
         available = False
 
       theCar = Car.Car(ranX, ranY, ranChargeLevel, ranDesiredCharge, available)
-      print("THE CAR DETAILS:" + str(theCar.xPos) + "," + str(theCar.yPos) + "," + str(theCar.chargeLevel) + "," + str(theCar.desiredCharge) + "," + str(theCar.available))
+      #print("THE CAR DETAILS:" + str(theCar.xPos) + "," + str(theCar.yPos) + "," + str(theCar.chargeLevel) + "," + str(theCar.desiredCharge) + "," + str(theCar.available))
       self.cars.append(theCar)
+    print(">> POPULATED THE LOT WITH " + str(numCars) +" CARS")
     return
     
   # meant for updating the availability status of all the cars in the lot, called from findAvailableCars
@@ -66,6 +80,7 @@ class ParkingLot:
       else:
         pass
     #print("A LIST OF AVAILABLE CARS:" + str(availableCars))
+    print(">> MADE A LIST OF THE AVAILABLE CARS IN THE LOT")
     return availableCars
 
   # charge a singular car
@@ -79,7 +94,7 @@ class ParkingLot:
       theBatt.available = False
       # count the time it took to charge
       t = theBatt.chargeRate * chargeDiff
-      print('the t value for this chargeCar() method is:' + str(t))
+      #print('the t value for this chargeCar() method is:' + str(t))
       return t
     else:
       print("ERROR: The Car's desired charge level may be lower than the current charge level. Could not charge this car.")
@@ -89,11 +104,11 @@ class ParkingLot:
     for k in range(len(self.navigators)):
       if ((self.navigators[k].xPos == 0) and (self.navigators[k].yPos == 0)): # assume all the navs at home are available
         navAtHome = self.navigators[k]
+        print("The navAtHome lives at " + str(navAtHome.xPos) + "," + str(navAtHome.yPos))
         return navAtHome
       else:
         pass
     return navAtHome
-  
 
   # search for and return a battery that is at home (the central station, aka (0,0))
   def findBattAtHome(self):
@@ -114,8 +129,7 @@ class ParkingLot:
         availableNavs.append(self.navigators[l])
       else:
         pass
-
-    print(str(availableNavs))
+    print("The available navs are " + str(availableNavs))
 
     # create a list of how far away each available navigator is from the car in question. this renews for every car
     # first find a navigator that is the closest and available
@@ -126,14 +140,12 @@ class ParkingLot:
       yDelta = abs(theCar.yPos - availableNavs[j].yPos)
       distanceAway = yDelta + xDelta #how far away is the navigator from the car
       navDistances.append(distanceAway) #add how far away the navigator is from the car to a list
-
-    print(str(navDistances))
+    print("the navDistances are: " + str(navDistances))
 
     # in the list that details how far away each available nav in the lot is, find the index value of the shortest distance
     chosen = navDistances.index(min(navDistances)) #chosen is an index value for a list
     closestNav = self.navigators[chosen]
-
-    print(str(chosen))
+    print("The chosen nav is in pos" + str(chosen) + "in that list, and is at pos " + str(closestNav.xPos) + "," + str(closestNav.yPos) + ".")
 
     return closestNav
 
@@ -149,38 +161,39 @@ class ParkingLot:
         navAtHome = self.findNavAtHome()
         battAtHome = self.findBattAtHome()
         movingTime = navAtHome.moveTo(theCar) # move navigator to the car in question. returns a time
-        print("just moved nav to the car in question")
+        print("MOVING NAV & BATT TO THE CAR TOOK " + str(movingTime) + "min.")
         battAtHome.xPos = navAtHome.xPos
         battAtHome.yPos = navAtHome.yPos # set battery pos equal to nav pos (assume this took no time, ie the navigator moves just as fast with as without the batt)
-        plugBattTime = navAtHome.useArm() #returns a time
+        plugBattTime = navAtHome.useArm() #returns time it took to plug the battery into the car
+        print("PLUGGING BATTERY IN TOOK " + str(plugBattTime) + "min.")
         theBatt = battAtHome #because the battery is no longer at the central station, we rename it
         chargingTime = self.chargeCar(theCar, theBatt) # charges theCar with theBatt. returns a time
+        print("CHARGING CAR TOOK " + str(chargingTime) + "min.")
         # pretend navigator we used is somewhere completely diff now. it's unavailable. see README file for a footnote on this
         navAtHome.available = False
         # grab the navigator that's closest to the car
         closestNav = self.findClosestNav(theCar)
         # move the closest navigator to the now much depleted battery, unplug the battery, then go home
         movingTime2 = closestNav.moveTo(theBatt)
-        print("just moved the closest nav to the now depleted batt")
+        print("The chosen nav is at pos " + str(closestNav.xPos) + "," + str(closestNav.yPos) + ".")
+        print("MOVING NEW NAV TO DONECAR TOOK " + str(movingTime2) + "min.")
+        # print("just moved the closest nav to the now depleted batt")
         unplugBattTime = navAtHome.useArm() #returns a time
+        print("UNPLUGGING BATTERY IN TOOK " + str(unplugBattTime) + "min.")
         movingTime3 = closestNav.goHome()
-        print("unplugged batt and nav went home")
+        print("MOVING THE NEW NAV & THE BATT HOME TOOK " + str(movingTime2) + "min.")
+        # print("unplugged batt and nav went home")
         # sets batt location to 0,0 and charges up to 100%
-        chargingTime2 = theBatt.chargeUp()
-        print("batt went home and charged up")
-        # make the navigator available again
+        #chargingTime2 = theBatt.chargeUp() #actually, don't use this cause the active user doesn't see this time. i'd need to be able to move two batts at once to use this
+        # print("batt went home and charged up")
+        # make the original navigator available again
         navAtHome.available = True
-
-        print(str(type(movingTime)))
-        print(str(type(plugBattTime)))
-        print(str(type(chargingTime)))
-        print(str(type(movingTime2)))
-        print(str(type(unplugBattTime)))
-        print(str(type(movingTime3)))
-        print(str(type(chargingTime2)))
-        
-        chargeCarTime = movingTime + plugBattTime + chargingTime + movingTime2 + unplugBattTime + movingTime3 + chargingTime2
+        chargeCarTime = movingTime + plugBattTime + chargingTime + movingTime2 + unplugBattTime + movingTime3 #+ chargingTime2
         totalTime.append(chargeCarTime)
+        print("------done charging that car------")
+      print(">> CHARGED ALL AVAILABLE CARS")
+      print("The time it took to charge all the available cars in the lot was:" + str(totalTime) + ". \nThat's equal to " + 
+            str(sum(totalTime)) + " minutes, or " + str(sum(totalTime)/60) + " hours.")
       return totalTime
     else:
       print("ERROR: There might not be cars in this lot that need charging. Could not charge these cars.")
